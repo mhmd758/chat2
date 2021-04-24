@@ -20,7 +20,8 @@ class _ChatState extends State<Chat> {
     if(messageController.text.length>0){
       await _firestore.collection("messages").add({
         'text':messageController.text,
-        'form':widget.user.email
+        'form':widget.user.email,
+        'date':DateTime.now().toIso8601String().toString(),
       });
       messageController.clear();
       scrollController.animateTo(scrollController.position.maxScrollExtent,
@@ -55,7 +56,7 @@ class _ChatState extends State<Chat> {
           children: [
             Expanded(
                 child:StreamBuilder<QuerySnapshot>(
-                  stream: _firestore.collection("messages").snapshots(),
+                  stream: _firestore.collection("messages").orderBy('date').snapshots(),
                   builder: (context,snapshot){
                     if (!snapshot.hasData) {
                       return Center(
@@ -72,6 +73,7 @@ class _ChatState extends State<Chat> {
 
 
                     return ListView(
+                      shrinkWrap: true,
                      controller: scrollController,
                      children: [
                        ...messages
@@ -135,17 +137,19 @@ class Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+       width:20 ,
+      color:Colors.blueAccent,
       child: Column(
         crossAxisAlignment: me? CrossAxisAlignment.end :CrossAxisAlignment.start,
         children: [
-          Text(from),
+          Text(from??''),
           Material(
             color: me? Colors.teal :Colors.red,
             borderRadius: BorderRadius.circular(10),
             elevation: 6,
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-              child: Text(text),
+              child: Text(text??'B'),
             ),
           )
         ],
